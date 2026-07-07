@@ -1,5 +1,9 @@
 "use client";
-
+import StakePanel from "@/components/staking/stake-panel";
+import PositionCard from "@/components/staking/position-card";
+import RewardsPanel from "@/components/staking/rewards-panel";
+import { RewardsCard } from "@/components/staking/rewards-card";
+import WithdrawPanel from "@/components/staking/withdraw-panel";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useAccount, useBalance, useConnect, useDisconnect, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { injected } from "wagmi/connectors";
@@ -7,7 +11,6 @@ import { formatUnits, parseUnits } from "viem";
 import { erc20Abi, stakingAbi, stakingAddress, stakingTokenAddress } from "@/lib/contracts";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-
 type ActionState = "idle" | "pending" | "confirmed" | "failed";
 type PendingAction = "stake" | "withdraw" | "claim" | "approve" | "mint" | null;
 
@@ -17,10 +20,10 @@ export function StakingCard() {
   const { disconnect } = useDisconnect();
   const [stakeAmount, setStakeAmount] = useState("100");
   const [withdrawAmount, setWithdrawAmount] = useState("50");
+  const [activeTab, setActiveTab] = useState<"stake" | "withdraw">("stake");
   const [actionState, setActionState] = useState<ActionState>("idle");
   const [message, setMessage] = useState<string>("Connect a wallet to begin.");
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
-
   const { data: balance } = useBalance({ address });
   const { data: tokenBalance } = useReadContract({
     address: stakingTokenAddress,
@@ -371,10 +374,10 @@ export function StakingCard() {
                 <p className="text-sm text-slate-400">Staked balance</p>
                 <p className="mt-2 text-2xl font-semibold text-white">{formattedStaked}</p>
               </div>
-              <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-4 shadow-sm">
-                <p className="text-sm text-slate-400">Pending rewards</p>
-                <p className="mt-2 text-2xl font-semibold text-white">{displayRewards.toFixed(4)}</p>
-              </div>
+             <RewardsCard
+  rewards={displayRewards.toFixed(4)}
+  rewardRate={formattedRewardRate}
+/>
               <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-4 shadow-sm">
                 <p className="text-sm text-slate-400">Reward rate</p>
                 <p className="mt-2 text-2xl font-semibold text-white">{formattedRewardRate}/sec</p>
@@ -394,93 +397,82 @@ export function StakingCard() {
         </Card>
 
         <Card className="border-slate-800 bg-gradient-to-b from-slate-950/70 to-slate-900/60 shadow-lg">
-          <CardContent>
-            <div className="space-y-4">
-              <label className="block text-sm text-slate-400">
-                Stake amount
-                <input
-                  type="number"
-                  value={stakeAmount}
-                  onChange={(event) => setStakeAmount(event.target.value)}
-                  className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none ring-0"
-                />
-              </label>
+  <CardContent>
 
-              <button
-                onClick={handleApprove}
-                disabled={!isConnected || isConfirming || !hasEnoughBalance}
-                className="w-full rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-3 font-medium text-cyan-300 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {pendingAction === "approve" ? "Approving..." : needsApproval ? "Approve tokens" : "Approved"}
-              </button>
+    <div className="space-y-6">
+<div className="mb-5 flex rounded-2xl bg-slate-900 p-1">
 
-              <button
-                onClick={handleStake}
-                disabled={!isConnected || isConfirming || !hasEnoughBalance || needsApproval}
-                className="w-full rounded-xl bg-emerald-500 px-4 py-3 font-medium text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {pendingAction === "stake" ? "Staking..." : "Stake"}
-              </button>
+  <button
+    onClick={() => setActiveTab("stake")}
+    className={`flex-1 rounded-xl px-4 py-3 font-semibold ${
+      activeTab === "stake"
+        ? "bg-cyan-400 text-slate-950"
+        : "text-slate-400"
+    }`}
+  >
+    Stake
+  </button>
 
-              <button
-                onClick={handleWithdraw}
-                disabled={!isConnected || isConfirming}
-                className="w-full rounded-xl border border-rose-700 bg-slate-900 px-4 py-3 font-medium text-white transition hover:border-rose-500 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {pendingAction === "withdraw" ? "Withdrawing..." : "Withdraw"}
-              </button>
+  <button
+    onClick={() => setActiveTab("withdraw")}
+    className={`flex-1 rounded-xl px-4 py-3 font-semibold ${
+      activeTab === "withdraw"
+        ? "bg-rose-400 text-slate-950"
+        : "text-slate-400"
+    }`}
+  >
+    Withdraw
+  </button>
 
-              <button
-                onClick={handleClaim}
-                disabled={!isConnected || isConfirming}
-                className="w-full rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 font-medium text-emerald-300 transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {pendingAction === "claim" ? "Claiming..." : "Claim rewards"}
-              </button>
+</div>
 
-              <button
-                onClick={handleMint}
-                disabled={!isConnected || isConfirming}
-                className="w-full rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 font-medium text-amber-300 transition hover:bg-amber-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {pendingAction === "mint" ? "Minting..." : "Request Faucet Tokens"}
-              </button>
 
-              <label className="block text-sm text-slate-400">
-                Withdraw amount
-                <input
-                  type="number"
-                  value={withdrawAmount}
-                  onChange={(event) => setWithdrawAmount(event.target.value)}
-                  className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none ring-0"
-                />
-              </label>
-              <button
-                onClick={handleWithdraw}
-                disabled={!isConnected || isConfirming}
-                className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 font-medium text-white transition hover:border-slate-500 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {pendingAction === "withdraw" ? "Withdrawing..." : "Withdraw"}
-              </button>
+{activeTab === "stake" ? (
+  <StakePanel
+    amount={stakeAmount}
+    setAmount={setStakeAmount}
+    onApprove={handleApprove}
+    onStake={handleStake}
+    needsApproval={needsApproval}
+    disabled={!isConnected}
+    loading={isConfirming}
+    tokenSymbol={tokenLabel}
+    balance={formattedTokenBalance}
+    onMax={() => setStakeAmount(formattedTokenBalance)}
+  />
+) : (
+  <WithdrawPanel
+    amount={withdrawAmount}
+    setAmount={setWithdrawAmount}
+    onWithdraw={handleWithdraw}
+    disabled={!isConnected}
+    loading={isConfirming}
+    tokenSymbol={tokenLabel}
+    balance={formattedStaked}
+    onMax={() => setWithdrawAmount(formattedStaked)}
+  />
+)}
 
-              <button
-                onClick={handleClaim}
-                disabled={!isConnected || isConfirming}
-                className="w-full rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 font-medium text-emerald-300 transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {pendingAction === "claim" ? "Claiming..." : "Claim rewards"}
-              </button>
-            </div>
+  <PositionCard
+    staked={formattedStaked}
+    tokenBalance={formattedTokenBalance}
+    totalStaked={formattedTotalStaked}
+    tokenSymbol={tokenLabel}
+  />
 
-            <div className="mt-6 overflow-auto rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm">
-              <p className="font-medium text-white">Transaction status</p>
-              <p className={`mt-2 ${actionState === "confirmed" ? "text-emerald-400" : actionState === "failed" ? "text-rose-400" : actionState === "pending" ? "text-amber-400" : "text-slate-400"}`}>
-                {message}
-              </p>
-              {isConfirming ? <p className="mt-2 text-slate-400">Waiting for wallet confirmation...</p> : null}
-            </div>
-          </CardContent>
-        </Card>
+  <RewardsPanel
+    rewards={displayRewards.toFixed(4)}
+    rewardRate={formattedRewardRate}
+    tokenSymbol={tokenLabel}
+    onClaim={handleClaim}
+    loading={isConfirming}
+  />
+
+  
+
+</div>
+  </CardContent>
+</Card>
       </div>
       </div>
     </div>
