@@ -425,6 +425,8 @@ export function StakingCard() {
              <RewardsCard
   rewards={displayRewards.toFixed(4)}
   rewardRate={formattedRewardRate}
+  tokenSymbol={tokenLabel}
+  claimedRewards={Number(formattedClaimedRewards).toFixed(4)}
   onClaim={handleClaim}
   disabled={!isConnected}
   loading={isConfirming}
@@ -525,6 +527,7 @@ export function StakingCard() {
     rewards={displayRewards.toFixed(4)}
     rewardRate={formattedRewardRate}
     tokenSymbol={tokenLabel}
+    claimedRewards={Number(formattedClaimedRewards).toFixed(4)}
     onClaim={handleClaim}
     loading={isConfirming}
   />
@@ -536,7 +539,12 @@ export function StakingCard() {
 </Card>
       </div>
 
-      <RecentTransactions address={address} refreshKey={historyRefreshKey} tokenSymbol={tokenLabel} />
+      <RecentTransactions
+        address={address}
+        refreshKey={historyRefreshKey}
+        tokenSymbol={tokenLabel}
+        pendingRewards={displayRewards.toFixed(4)}
+      />
       </div>
     </div>
   );

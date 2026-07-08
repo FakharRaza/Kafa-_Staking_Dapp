@@ -3,6 +3,7 @@ type RewardsPanelProps = {
   rewards: string;
   rewardRate: string;
   tokenSymbol: string;
+  claimedRewards?: string;
   onClaim: () => void;
   disabled?: boolean;
   loading?: boolean;
@@ -12,6 +13,7 @@ export default function RewardsPanel({
   rewards,
   rewardRate,
   tokenSymbol,
+  claimedRewards,
   onClaim,
   disabled,
   loading,
@@ -24,7 +26,7 @@ export default function RewardsPanel({
           Rewards
         </p>
 
-        <h2 className="mt-2 text-3xl font-bold text-white">
+        <h2 className="mt-2 break-all text-2xl font-bold text-white sm:text-3xl">
           {rewards} {tokenSymbol}
         </h2>
 
@@ -34,16 +36,26 @@ export default function RewardsPanel({
       </div>
 
 
-      <div className="rounded-2xl bg-slate-900/70 p-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl bg-slate-900/70 p-4">
+          <p className="text-xs text-slate-400">
+            Reward Rate
+          </p>
 
-        <p className="text-xs text-slate-400">
-          Reward Rate
-        </p>
+          <p className="mt-2 text-xl font-semibold text-emerald-400">
+            {rewardRate} {tokenSymbol}/sec
+          </p>
+        </div>
 
-        <p className="mt-2 text-xl font-semibold text-emerald-400">
-          {rewardRate} {tokenSymbol}/sec
-        </p>
+        <div className="rounded-2xl bg-slate-900/70 p-4">
+          <p className="text-xs text-slate-400">
+            Claimed Rewards
+          </p>
 
+          <p className="mt-2 text-xl font-semibold text-white">
+            {claimedRewards ?? "0"} {tokenSymbol}
+          </p>
+        </div>
       </div>
 
 

@@ -66,7 +66,17 @@ function shortenHash(hash: string): string {
 const EXPLORER_TX_BASE = "https://sepolia.etherscan.io/tx/";
 const LOOKBACK_BLOCKS = 200_000n;
 
-export function RecentTransactions({ address, refreshKey, tokenSymbol = "" }: { address?: Address; refreshKey?: number; tokenSymbol?: string }) {
+export function RecentTransactions({
+  address,
+  refreshKey,
+  tokenSymbol = "",
+  pendingRewards,
+}: {
+  address?: Address;
+  refreshKey?: number;
+  tokenSymbol?: string;
+  pendingRewards?: string;
+}) {
   const publicClient = usePublicClient();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
@@ -153,11 +163,19 @@ export function RecentTransactions({ address, refreshKey, tokenSymbol = "" }: { 
 
   return (
     <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg backdrop-blur-xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold text-white">Recent Transactions</h2>
-        <span className="rounded-full border border-slate-700 bg-slate-900/60 px-3 py-1 text-xs text-slate-400">
-          {address ? "On-chain" : "Connect wallet"}
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          {address && pendingRewards ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+              Pending: {pendingRewards} {tokenSymbol}
+            </span>
+          ) : null}
+          <span className="rounded-full border border-slate-700 bg-slate-900/60 px-3 py-1 text-xs text-slate-400">
+            {address ? "On-chain" : "Connect wallet"}
+          </span>
+        </div>
       </div>
 
       <div className="mt-5 overflow-x-auto">
