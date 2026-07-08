@@ -18,11 +18,13 @@ contract Staking is ReentrancyGuard, Ownable {
     mapping(address => uint256) public balanceOf;
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
+    mapping(address => uint256) public totalClaimedRewards;
 
     event Staked(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
     event RewardsClaimed(address indexed user, uint256 amount);
     event RewardRateUpdated(uint256 newRate);
+    event RewardAdded(address indexed funder, uint256 amount);
 
     error ZeroAmount();
     error InsufficientBalance();
@@ -48,17 +50,22 @@ contract Staking is ReentrancyGuard, Ownable {
     }
 
     function rewardPerToken(address account) public view returns (uint256) {
-        if (totalStaked == 0) {
+        uint256 staked = totalStaked;
+        if (staked == 0) {
             return rewardPerTokenStored;
         }
 
         uint256 elapsed = block.timestamp - lastUpdateTime;
         uint256 rewardAccrued = elapsed * rewardRatePerSecond;
-        return rewardPerTokenStored + (rewardAccrued * 1e18 / totalStaked);
+        return rewardPerTokenStored + (rewardAccrued * 1e18 / staked);
     }
 
     function earned(address account) public view returns (uint256) {
-        return ((balanceOf[account] * (rewardPerToken(address(account)) - userRewardPerTokenPaid[account])) / 1e18) + rewards[account];
+        uint256 staked = balanceOf[account];
+        if (staked == 0) {
+            return rewards[account];
+        }
+        return ((staked * (rewardPerToken(account) - userRewardPerTokenPaid[account])) / 1e18) + rewards[account];
     }
 
     function stake(uint256 amount) external nonReentrant {
@@ -91,6 +98,7 @@ contract Staking is ReentrancyGuard, Ownable {
         if (reward == 0) revert ZeroAmount();
 
         rewards[msg.sender] = 0;
+        totalClaimedRewards[msg.sender] += reward;
         stakingToken.safeTransfer(msg.sender, reward);
 
         emit RewardsClaimed(msg.sender, reward);
@@ -100,5 +108,11 @@ contract Staking is ReentrancyGuard, Ownable {
         _updateReward(address(0));
         rewardRatePerSecond = newRate;
         emit RewardRateUpdated(newRate);
+    }
+
+    function addRewards(uint256 amount) external {
+        if (amount == 0) revert ZeroAmount();
+        stakingToken.safeTransferFrom(msg.sender, address(this), amount);
+        emit RewardAdded(msg.sender, amount);
     }
 }

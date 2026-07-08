@@ -31,15 +31,16 @@ A decentralized staking application where users connect a wallet, stake KAFA (ER
 
 ## Product
 
-- Connect wallet (RainbowKit/Wagmi), view APR/TVL/Total Staked/Active Stakers stats, stake/withdraw KAFA tokens, view live pending rewards and claim them, and see a Recent Transactions history (currently demo/dummy data).
+- Connect wallet (RainbowKit/Wagmi), view a dashboard (APR/TVL/Total Staked/Active Stakers, plus wallet balance/staked balance/pending rewards/claimed rewards/reward rate when connected), stake/withdraw KAFA tokens, view live per-wallet pending rewards and claim them, mint test tokens via an on-chain faucet button, and see a Recent Transactions history built from real on-chain Staked/Withdrawn/RewardsClaimed event logs for the connected wallet (links to Sepolia Etherscan).
 
 ## Deployed contracts (Sepolia testnet, chain id 11155111)
 
-- MockERC20 (KAFA test token): `0xDEaD19098e9D9ca64EF043D0BF3aE0AECa850809`
-- Staking: `0xD484364608b463eDc89a8500e4B1A29DEe5299a6`
+- MockERC20 (KAFA test token): `0xDEaD19098e9D9ca64EF043D0BF3aE0AECa850809` (unchanged since first deploy)
+- Staking (v2, current): `0xE1Eb54D0ccDbF0ddAA9954F5f09b9068394DfBfE` — redeployed to add `totalClaimedRewards` mapping + `RewardAdded` event + `addRewards()` function; the original v1 address `0xD484364608b463eDc89a8500e4B1A29DEe5299a6` is abandoned/unused
 - Deployer/reward-pool funder wallet: `0xC04f96C3Bb3853268Eae1A5A0BF4Aa3479B689D4`
-- Reward pool pre-funded with 1,000,000 test tokens minted directly to the Staking contract.
+- Reward pool pre-funded with 1,000,000 test tokens minted directly to the v2 Staking contract (v1's reward pool is stranded/unused).
 - Frontend defaults to these addresses in `src/lib/contracts.ts` (overridable via `VITE_STAKING_ADDRESS` / `VITE_STAKING_TOKEN_ADDRESS`).
+- Deploy script for redeploying Staking against the existing token: `.migration-backup/packages/contracts/scripts/deploy-staking-v2.ts`.
 
 ## User preferences
 

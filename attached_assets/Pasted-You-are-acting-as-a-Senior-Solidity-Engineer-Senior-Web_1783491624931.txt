@@ -1,0 +1,167 @@
+You are acting as a Senior Solidity Engineer + Senior Web3 Frontend Engineer.
+
+This project is already functional.
+
+DO NOT rewrite the project.
+DO NOT remove existing features.
+DO NOT redesign the architecture.
+Upgrade the existing code incrementally.
+
+Current status:
+
+✅ Smart contracts deployed on Sepolia
+✅ Frontend connected
+✅ Wallet connect
+✅ ERC20 Approve
+✅ Stake
+✅ Withdraw
+✅ Claim Rewards
+✅ Faucet
+✅ Dashboard
+✅ APR
+✅ TVL
+✅ History
+✅ Responsive layout
+✅ Production build passes
+
+Your task is to perform a production-level audit and implement only the following improvements.
+
+---
+
+## SMART CONTRACT IMPROVEMENTS
+
+1. Audit reward accounting.
+
+2. Ensure rewards stop accumulating immediately after a user's staking balance becomes zero.
+
+3. Verify reward calculation follows the standard staking pattern:
+
+* rewardPerTokenStored
+* lastUpdateTime
+* userRewardPerTokenPaid
+* rewards[user]
+
+or another mathematically correct implementation.
+
+4. Prevent reward leakage after complete withdrawal.
+
+5. Add:
+
+mapping(address => uint256) public totalClaimedRewards;
+
+Update it whenever claimRewards() executes.
+
+6. Add any missing events:
+
+Stake
+Withdraw
+RewardPaid
+RewardAdded
+
+7. Optimize gas where possible without changing behavior.
+
+8. Keep all existing functionality working.
+
+---
+
+## FRONTEND IMPROVEMENTS
+
+1. Display Pending Rewards updating live every second.
+
+2. Display Claimed Rewards.
+
+3. Show token symbol consistently across the application.
+
+4. Improve transaction history.
+
+History should display:
+
+* Stake
+* Withdraw
+* Claim
+
+with
+
+amount
+
+timestamp
+
+transaction hash
+
+status
+
+5. Improve dashboard statistics.
+
+Include:
+
+Wallet Balance
+
+Staked Balance
+
+Pending Rewards
+
+Claimed Rewards
+
+APR
+
+TVL
+
+Reward Rate
+
+6. Improve loading states.
+
+7. Improve transaction confirmations.
+
+8. Improve error messages.
+
+9. Ensure every component is fully responsive.
+
+Desktop
+
+Laptop
+
+Tablet
+
+Mobile
+
+10. Remove unnecessary re-renders.
+
+11. Optimize React rendering.
+
+12. Keep TypeScript clean.
+
+---
+
+## TESTING
+
+After every modification:
+
+Run build.
+
+Fix any errors.
+
+Verify all contract interactions.
+
+Do not continue until the build succeeds.
+
+---
+
+IMPORTANT
+
+Never rewrite completed code.
+
+Never break existing functionality.
+
+Only improve and extend the project.
+
+Work step by step.
+
+After each completed improvement, explain exactly:
+
+* what changed
+* why it changed
+* whether smart contract redeployment is required
+
+If a smart contract modification changes storage or logic, explicitly state that redeployment is required before the frontend can use the updated contract.
+
+The final goal is a production-quality staking dApp suitable for deployment, portfolio showcase, and real-world demonstration.

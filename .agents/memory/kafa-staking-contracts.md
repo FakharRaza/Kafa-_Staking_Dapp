@@ -12,3 +12,7 @@ The Solidity contracts for the Kafa staking dApp are NOT part of the pnpm worksp
 **Reward pool funding:** the Staking contract pays `claimRewards` out of its own token balance (same MockERC20 as the staked token) — it does NOT mint on claim. After deploying, mint a reward-pool balance directly to the Staking contract address (e.g. 1,000,000 tokens) or `claimRewards` will revert/fail for any staker once pending rewards exceed the contract's raw balance.
 
 **Security note:** if a user pastes a raw private key directly in chat, treat it as compromised immediately (chat is logged) — never reuse it for anything beyond throwaway testnet purposes, and prefer requesting a fresh burner-wallet key via the secrets manager (`requestEnvVar`) instead of the one shared in plaintext.
+
+**Storage-layout changes require redeployment:** adding a new state variable (e.g. a `mapping`) or event to `Staking.sol` cannot be applied in-place — it needs a full redeploy to a new address, re-funding the reward pool, and users re-approving/re-staking against the new contract (old approvals/stakes don't carry over). Always tell the user explicitly when a change requires this.
+
+**Building the frontend outside its workflow:** `artifacts/kafa-staking`'s `vite.config.ts` requires `PORT` and `BASE_PATH` env vars even for a one-off `pnpm run build` outside the workflow — set them inline (e.g. `PORT=5173 BASE_PATH=/kafa-staking pnpm run build`) to validate production builds ad hoc.

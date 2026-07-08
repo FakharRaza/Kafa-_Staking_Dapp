@@ -454,8 +454,8 @@
       ]
     },
     "/home/runner/workspace/.migration-backup/packages/contracts/contracts/Staking.sol": {
-      "lastModificationDate": 1783484075968,
-      "contentHash": "2da3ae7faa99f52f58f6890f10845cb2",
+      "lastModificationDate": 1783491759246,
+      "contentHash": "27256d1b9974b9e95f143421b078e7d4",
       "sourceName": "contracts/Staking.sol",
       "solcConfig": {
         "version": "0.8.24",

@@ -66,6 +66,13 @@ export function StakingCard() {
     args: [address!],
     query: { enabled: Boolean(address) },
   });
+  const { data: claimedRewards, refetch: refetchClaimedRewards } = useReadContract({
+    address: stakingAddress,
+    abi: stakingAbi,
+    functionName: "totalClaimedRewards",
+    args: [address!],
+    query: { enabled: Boolean(address) },
+  });
   const { data: rewardRate } = useReadContract({
     address: stakingAddress,
     abi: stakingAbi,
@@ -76,6 +83,7 @@ export function StakingCard() {
     abi: stakingAbi,
     functionName: "totalStaked",
   });
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   const { writeContract, data: txHash, error: writeError } = useWriteContract();
   const { isLoading: isConfirming, isSuccess, isError } = useWaitForTransactionReceipt({ hash: txHash });
@@ -294,7 +302,9 @@ export function StakingCard() {
       refetchAllowance();
       refetchStakedBalance();
       refetchRewards();
+      refetchClaimedRewards();
       refetchTotalStaked();
+      setHistoryRefreshKey((key) => key + 1);
     }
   }, [
     isSuccess,
@@ -304,10 +314,18 @@ export function StakingCard() {
     refetchAllowance,
     refetchStakedBalance,
     refetchRewards,
+    refetchClaimedRewards,
     refetchTotalStaked,
   ]);
 
-  // Reward ticker: animate rewards increasing locally
+  const formattedClaimedRewards = useMemo(
+    () => (claimedRewards ? formatUnits(claimedRewards as bigint, 18) : "0"),
+    [claimedRewards]
+  );
+
+  // Reward ticker: animate rewards increasing locally, proportional to this
+  // wallet's share of the pool (matches the on-chain rewardPerToken formula),
+  // so it stops ticking once the wallet's staked balance is zero.
   const [displayRewards, setDisplayRewards] = useState<number>(() => Number(formattedRewards));
   useEffect(() => {
     setDisplayRewards(Number(formattedRewards));
@@ -319,15 +337,18 @@ export function StakingCard() {
       const now = Date.now();
       const dt = (now - last) / 1000;
       last = now;
-      const rate = Number(formattedRewardRate);
-      if (!isNaN(rate) && rate > 0) {
-        setDisplayRewards((v) => v + rate * dt);
+      const globalRate = Number(formattedRewardRate);
+      const userStaked = Number(formattedStaked);
+      const poolStaked = Number(formattedTotalStaked);
+      const userShareRate = poolStaked > 0 && userStaked > 0 ? globalRate * (userStaked / poolStaked) : 0;
+      if (!isNaN(userShareRate) && userShareRate > 0) {
+        setDisplayRewards((v) => v + userShareRate * dt);
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [formattedRewardRate]);
+  }, [formattedRewardRate, formattedStaked, formattedTotalStaked]);
 
   const handleConnectWallet = () => {
     if (connector) {
@@ -347,6 +368,12 @@ export function StakingCard() {
         totalStaked={formattedTotalStaked}
         activeStakers="124"
         tokenSymbol={tokenLabel}
+        isConnected={isConnected}
+        walletBalance={Number(formattedTokenBalance || "0").toFixed(4)}
+        stakedBalance={Number(formattedStaked).toFixed(4)}
+        pendingRewards={displayRewards.toFixed(4)}
+        claimedRewards={Number(formattedClaimedRewards).toFixed(4)}
+        rewardRate={formattedRewardRate}
       />
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-3">
@@ -509,7 +536,7 @@ export function StakingCard() {
 </Card>
       </div>
 
-      <RecentTransactions />
+      <RecentTransactions address={address} refreshKey={historyRefreshKey} tokenSymbol={tokenLabel} />
       </div>
     </div>
   );

@@ -26,6 +26,7 @@ import type {
 export interface StakingInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "addRewards"
       | "balanceOf"
       | "claimRewards"
       | "earned"
@@ -39,6 +40,7 @@ export interface StakingInterface extends Interface {
       | "setRewardRate"
       | "stake"
       | "stakingToken"
+      | "totalClaimedRewards"
       | "totalStaked"
       | "transferOwnership"
       | "userRewardPerTokenPaid"
@@ -48,12 +50,17 @@ export interface StakingInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "OwnershipTransferred"
+      | "RewardAdded"
       | "RewardRateUpdated"
       | "RewardsClaimed"
       | "Staked"
       | "Withdrawn"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "addRewards",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [AddressLike]
@@ -98,6 +105,10 @@ export interface StakingInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "totalClaimedRewards",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "totalStaked",
     values?: undefined
   ): string;
@@ -114,6 +125,7 @@ export interface StakingInterface extends Interface {
     values: [BigNumberish]
   ): string;
 
+  decodeFunctionResult(functionFragment: "addRewards", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "claimRewards",
@@ -152,6 +164,10 @@ export interface StakingInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "totalClaimedRewards",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "totalStaked",
     data: BytesLike
   ): Result;
@@ -172,6 +188,19 @@ export namespace OwnershipTransferredEvent {
   export interface OutputObject {
     previousOwner: string;
     newOwner: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RewardAddedEvent {
+  export type InputTuple = [funder: AddressLike, amount: BigNumberish];
+  export type OutputTuple = [funder: string, amount: bigint];
+  export interface OutputObject {
+    funder: string;
+    amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -273,6 +302,8 @@ export interface Staking extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  addRewards: TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
+
   balanceOf: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
   claimRewards: TypedContractMethod<[], [void], "nonpayable">;
@@ -303,6 +334,12 @@ export interface Staking extends BaseContract {
 
   stakingToken: TypedContractMethod<[], [string], "view">;
 
+  totalClaimedRewards: TypedContractMethod<
+    [arg0: AddressLike],
+    [bigint],
+    "view"
+  >;
+
   totalStaked: TypedContractMethod<[], [bigint], "view">;
 
   transferOwnership: TypedContractMethod<
@@ -323,6 +360,9 @@ export interface Staking extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "addRewards"
+  ): TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "balanceOf"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
@@ -363,6 +403,9 @@ export interface Staking extends BaseContract {
     nameOrSignature: "stakingToken"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "totalClaimedRewards"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
     nameOrSignature: "totalStaked"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -381,6 +424,13 @@ export interface Staking extends BaseContract {
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
+  >;
+  getEvent(
+    key: "RewardAdded"
+  ): TypedContractEvent<
+    RewardAddedEvent.InputTuple,
+    RewardAddedEvent.OutputTuple,
+    RewardAddedEvent.OutputObject
   >;
   getEvent(
     key: "RewardRateUpdated"
@@ -421,6 +471,17 @@ export interface Staking extends BaseContract {
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject
+    >;
+
+    "RewardAdded(address,uint256)": TypedContractEvent<
+      RewardAddedEvent.InputTuple,
+      RewardAddedEvent.OutputTuple,
+      RewardAddedEvent.OutputObject
+    >;
+    RewardAdded: TypedContractEvent<
+      RewardAddedEvent.InputTuple,
+      RewardAddedEvent.OutputTuple,
+      RewardAddedEvent.OutputObject
     >;
 
     "RewardRateUpdated(uint256)": TypedContractEvent<
