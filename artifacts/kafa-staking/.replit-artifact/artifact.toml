@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Kafa Staking dApp"
+version = "1.0.0"
+id = "artifacts/kafa-staking"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24788
+
+[services.development]
+run = "pnpm --filter @workspace/kafa-staking run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/kafa-staking", "run", "build" ]
+publicDir = "artifacts/kafa-staking/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24788"
+BASE_PATH = "/"

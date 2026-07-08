@@ -1,0 +1,1 @@
+- [Next.js to Vite migration gotchas](nextjs-to-vite-migration.md) — copy script client-dir path, wagmi major-version pin, scaffold theme CSS placeholders.
