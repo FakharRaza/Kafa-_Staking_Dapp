@@ -9,6 +9,7 @@ import { injected } from "wagmi/connectors";
 import { formatUnits, parseUnits } from "viem";
 import { erc20Abi, stakingAbi, stakingAddress, stakingTokenAddress } from "@/lib/contracts";
 import { Card, CardContent } from "@/components/ui/card";
+import { StatsSection } from "@/components/stats-section";
 import { toast } from "sonner";
 type ActionState = "idle" | "pending" | "confirmed" | "failed";
 type PendingAction = "stake" | "withdraw" | "claim" | "approve" | "mint" | null;
@@ -326,6 +327,13 @@ export function StakingCard() {
   return (
     <div className="max-h-[80vh] overflow-auto">
       <div className="w-full max-w-6xl rounded-3xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-black/40 backdrop-blur">
+      <StatsSection
+        apr="12%"
+        tvl={formattedTotalStaked}
+        totalStaked={formattedTotalStaked}
+        activeStakers="124"
+        tokenSymbol={tokenLabel}
+      />
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-3">
           <p className="text-sm uppercase tracking-[0.35em] text-cyan-400">Kafa staking</p>
