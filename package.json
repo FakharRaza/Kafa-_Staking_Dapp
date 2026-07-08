@@ -1,32 +1,19 @@
 {
-  "name": "kafa-staking-dapp",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Monorepo for the Kafa staking dApp",
-  "workspaces": [
-    "packages/*"
-  ],
+  "name": "workspace",
+  "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
-    "test": "echo \"No root tests configured yet\""
+    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+  },
+  "private": true,
+  "dependencies": {
+    "@replit/connectors-sdk": "^0.4.1"
   },
   "devDependencies": {
-    "postcss": "^8.4.49"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/FakharRaza/Kafa-_Staking_Dapp.git"
-  },
-  "keywords": [
-    "web3",
-    "staking",
-    "hardhat",
-    "nextjs"
-  ],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/FakharRaza/Kafa-_Staking_Dapp/issues"
-  },
-  "homepage": "https://github.com/FakharRaza/Kafa-_Staking_Dapp#readme"
+    "prettier": "^3.9.4",
+    "typescript": "~5.9.3"
+  }
 }
