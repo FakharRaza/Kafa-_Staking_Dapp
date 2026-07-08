@@ -1,7 +1,7 @@
 import type { Address } from "viem";
 
-export const stakingAddress = ((import.meta.env.VITE_STAKING_ADDRESS as Address | undefined) || "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512") as Address;
-export const stakingTokenAddress = ((import.meta.env.VITE_STAKING_TOKEN_ADDRESS as Address | undefined) || "0x5FbDB2315678afecb367f032d93F642f64180aa3") as Address;
+export const stakingAddress = ((import.meta.env.VITE_STAKING_ADDRESS as Address | undefined) || "0xD484364608b463eDc89a8500e4B1A29DEe5299a6") as Address;
+export const stakingTokenAddress = ((import.meta.env.VITE_STAKING_TOKEN_ADDRESS as Address | undefined) || "0xDEaD19098e9D9ca64EF043D0BF3aE0AECa850809") as Address;
 
 export const stakingAbi = [
   {

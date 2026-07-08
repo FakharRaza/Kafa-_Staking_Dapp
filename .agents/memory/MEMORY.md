@@ -1,1 +1,2 @@
 - [Next.js to Vite migration gotchas](nextjs-to-vite-migration.md) — copy script client-dir path, wagmi major-version pin, scaffold theme CSS placeholders.
+- [Kafa staking contracts deployment](kafa-staking-contracts.md) — Hardhat project lives outside pnpm workspace; env var names and RPC URL validation gotchas for Sepolia deploys.

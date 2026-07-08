@@ -1,8 +1,21 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 
-const sepoliaRpcUrl = process.env.SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com";
-const privateKey = process.env.PRIVATE_KEY;
+function resolveRpcUrl(candidate: string | undefined, fallback: string): string {
+  if (!candidate) return fallback;
+  try {
+    new URL(candidate);
+    return candidate;
+  } catch {
+    return fallback;
+  }
+}
+
+const sepoliaRpcUrl = resolveRpcUrl(
+  process.env.SEPOLIA_RPC_URL,
+  "https://ethereum-sepolia-rpc.publicnode.com",
+);
+const privateKey = process.env.SEPOLIA_PRIVATE_KEY || process.env.PRIVATE_KEY;
 
 const config: HardhatUserConfig = {
   solidity: {
