@@ -33,7 +33,7 @@ export const stakingAbi = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "address", name: "", type: "address" }],
+    inputs: [],
     name: "stakingToken",
     outputs: [{ internalType: "address", name: "", type: "address" }],
     stateMutability: "view",

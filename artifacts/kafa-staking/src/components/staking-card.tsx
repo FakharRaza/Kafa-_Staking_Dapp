@@ -25,8 +25,8 @@ export function StakingCard() {
   const [actionState, setActionState] = useState<ActionState>("idle");
   const [message, setMessage] = useState<string>("Connect a wallet to begin.");
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
-  const { data: balance } = useBalance({ address });
-  const { data: tokenBalance } = useReadContract({
+  const { data: balance, refetch: refetchNativeBalance } = useBalance({ address });
+  const { data: tokenBalance, refetch: refetchTokenBalance } = useReadContract({
     address: stakingTokenAddress,
     abi: erc20Abi,
     functionName: "balanceOf",
@@ -45,21 +45,21 @@ export function StakingCard() {
     functionName: "symbol",
     query: { enabled: Boolean(stakingTokenAddress) },
   });
-  const { data: allowance } = useReadContract({
+  const { data: allowance, refetch: refetchAllowance } = useReadContract({
     address: stakingTokenAddress,
     abi: erc20Abi,
     functionName: "allowance",
     args: [address!, stakingAddress],
     query: { enabled: Boolean(address) },
   });
-  const { data: stakedBalance } = useReadContract({
+  const { data: stakedBalance, refetch: refetchStakedBalance } = useReadContract({
     address: stakingAddress,
     abi: stakingAbi,
     functionName: "balanceOf",
     args: [address!],
     query: { enabled: Boolean(address) },
   });
-  const { data: rewards } = useReadContract({
+  const { data: rewards, refetch: refetchRewards } = useReadContract({
     address: stakingAddress,
     abi: stakingAbi,
     functionName: "earned",
@@ -71,7 +71,7 @@ export function StakingCard() {
     abi: stakingAbi,
     functionName: "rewardRatePerSecond",
   });
-  const { data: totalStaked } = useReadContract({
+  const { data: totalStaked, refetch: refetchTotalStaked } = useReadContract({
     address: stakingAddress,
     abi: stakingAbi,
     functionName: "totalStaked",
@@ -286,13 +286,26 @@ export function StakingCard() {
     }
   }, [isSuccess, pendingAction, address]);
 
-  // Refresh balance when tx completes or fails
+  // Refresh all on-chain balances/allowance/rewards once a transaction confirms
   useEffect(() => {
-    if ((isSuccess || isError || writeError) && address) {
-      // trigger a soft re-fetch by relying on wagmi's useBalance auto refetch
-      setTimeout(() => {}, 0);
+    if (isSuccess && address) {
+      refetchNativeBalance();
+      refetchTokenBalance();
+      refetchAllowance();
+      refetchStakedBalance();
+      refetchRewards();
+      refetchTotalStaked();
     }
-  }, [isSuccess, isError, writeError, address]);
+  }, [
+    isSuccess,
+    address,
+    refetchNativeBalance,
+    refetchTokenBalance,
+    refetchAllowance,
+    refetchStakedBalance,
+    refetchRewards,
+    refetchTotalStaked,
+  ]);
 
   // Reward ticker: animate rewards increasing locally
   const [displayRewards, setDisplayRewards] = useState<number>(() => Number(formattedRewards));
@@ -385,6 +398,9 @@ export function StakingCard() {
              <RewardsCard
   rewards={displayRewards.toFixed(4)}
   rewardRate={formattedRewardRate}
+  onClaim={handleClaim}
+  disabled={!isConnected}
+  loading={isConfirming}
 />
               <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-4 shadow-sm">
                 <p className="text-sm text-slate-400">Reward rate</p>
@@ -399,7 +415,17 @@ export function StakingCard() {
             <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm text-slate-400">
               {address ? <p className="break-all">Wallet: {address}</p> : <p>Connect a wallet to start staking.</p>}
               {balance ? <p className="mt-2">Native balance: <span className="font-semibold">{nativeBalance.toFixed(4)} {balance.symbol}</span></p> : null}
-              <p className="mt-2">Staking token balance: <span className="font-semibold">{Number(formattedTokenBalance || "0").toFixed(4)} {tokenLabel}</span></p>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <p>Staking token balance: <span className="font-semibold">{Number(formattedTokenBalance || "0").toFixed(4)} {tokenLabel}</span></p>
+                <button
+                  type="button"
+                  onClick={handleMint}
+                  disabled={!isConnected || isConfirming}
+                  className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-400/20 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isConfirming && pendingAction === "mint" ? "Minting..." : "Get Test Tokens"}
+                </button>
+              </div>
             </div>
           </CardContent>
         </Card>

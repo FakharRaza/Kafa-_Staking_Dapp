@@ -2,11 +2,17 @@
 interface RewardsCardProps {
   rewards: string;
   rewardRate: string;
+  onClaim?: () => void;
+  disabled?: boolean;
+  loading?: boolean;
 }
 
 export function RewardsCard({
   rewards,
   rewardRate,
+  onClaim,
+  disabled,
+  loading,
 }: RewardsCardProps) {
   return (
     <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 p-6 shadow-lg">
@@ -47,6 +53,8 @@ export function RewardsCard({
 
 
       <button
+        onClick={onClaim}
+        disabled={disabled || loading}
         className="
         mt-6
         w-full
@@ -58,9 +66,11 @@ export function RewardsCard({
         text-slate-950
         transition
         hover:bg-emerald-400
+        disabled:cursor-not-allowed
+        disabled:opacity-50
         "
       >
-        Claim Rewards
+        {loading ? "Claiming..." : "Claim Rewards"}
       </button>
 
     </div>
