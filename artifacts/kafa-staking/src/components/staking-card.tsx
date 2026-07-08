@@ -10,6 +10,7 @@ import { formatUnits, parseUnits } from "viem";
 import { erc20Abi, stakingAbi, stakingAddress, stakingTokenAddress } from "@/lib/contracts";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatsSection } from "@/components/stats-section";
+import { RecentTransactions } from "@/components/recent-transactions";
 import { toast } from "sonner";
 type ActionState = "idle" | "pending" | "confirmed" | "failed";
 type PendingAction = "stake" | "withdraw" | "claim" | "approve" | "mint" | null;
@@ -481,6 +482,8 @@ export function StakingCard() {
   </CardContent>
 </Card>
       </div>
+
+      <RecentTransactions />
       </div>
     </div>
   );
