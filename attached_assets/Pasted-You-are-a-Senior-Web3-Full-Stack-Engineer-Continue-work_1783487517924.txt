@@ -1,0 +1,103 @@
+You are a Senior Web3 Full-Stack Engineer.
+
+Continue working on this existing project without rewriting completed code.
+
+Project stack:
+
+* Next.js 14 (App Router)
+* TypeScript
+* Tailwind CSS
+* Wagmi v2
+* Viem
+* RainbowKit
+* Solidity staking smart contracts
+
+Completed features:
+
+✅ Wallet Connect
+✅ ERC20 Approve
+✅ Stake
+✅ Withdraw
+✅ Claim Rewards
+✅ Faucet Mint
+✅ Live Reward Counter
+✅ Position Card
+✅ Rewards Panel
+✅ Statistics Dashboard
+✅ APR Card
+✅ TVL Card
+✅ Transaction History
+✅ Responsive UI
+✅ Professional Dashboard Layout
+✅ Component-based Architecture
+✅ Production build passes successfully (`npm run build`)
+
+Important rules:
+
+* Do NOT rewrite existing code.
+* Do NOT modify smart contract logic unless absolutely necessary.
+* Do NOT change contract addresses.
+* Do NOT remove existing UI.
+* Work incrementally.
+* After each completed task, explain the changes and stop for confirmation.
+
+Remaining roadmap:
+
+### Phase 1 — Testnet Validation
+
+* Verify every contract interaction:
+
+  * Connect Wallet
+  * Approve
+  * Stake
+  * Withdraw
+  * Claim Rewards
+  * Faucet
+* Check loading states.
+* Verify error handling.
+* Verify transaction confirmations.
+* Verify balance updates after every transaction.
+
+### Phase 2 — UI Polish
+
+* Fix any alignment issues.
+* Improve spacing and responsiveness.
+* Improve typography consistency.
+* Improve animations and transitions.
+* Ensure desktop, tablet, and mobile layouts are polished.
+* Remove any visual bugs.
+
+### Phase 3 — Production Readiness
+
+* Optimize React rendering.
+* Remove unnecessary re-renders.
+* Improve performance.
+* Improve accessibility.
+* Clean TypeScript warnings.
+* Remove dead code.
+* Organize imports.
+
+### Phase 4 — Deployment Preparation
+
+* Verify environment variables.
+* Verify contract configuration.
+* Verify production build.
+* Prepare for deployment (Vercel/Replit).
+* Ensure no development-only code remains.
+
+### Phase 5 — Documentation
+
+* Generate a professional README including:
+
+  * Features
+  * Tech Stack
+  * Installation
+  * Environment Variables
+  * Running Locally
+  * Deployment
+  * Smart Contract Addresses
+  * Project Screenshots (placeholders)
+  * Folder Structure
+  * Future Improvements
+
+Always preserve existing functionality and improve the project step by step until it is production-ready.
