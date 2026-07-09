@@ -47,3 +47,11 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+# Local config
+.config/
+
+# Logs
+*.log
+
+# Migration backup
+.migration-backup/
