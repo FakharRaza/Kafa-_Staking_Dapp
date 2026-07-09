@@ -64,7 +64,17 @@ function shortenHash(hash: string): string {
 }
 
 const EXPLORER_TX_BASE = "https://sepolia.etherscan.io/tx/";
-const LOOKBACK_BLOCKS = 10_000n;
+const LOOKBACK_BLOCKS = 5_000n;
+const RPC_TIMEOUT_MS = 8_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+    ),
+  ]);
+}
 
 export function RecentTransactions({
   address,
@@ -91,46 +101,51 @@ export function RecentTransactions({
     setLoading(true);
     setErrorMessage(null);
     try {
-      const latestBlock = await publicClient.getBlockNumber();
+      const latestBlock = await withTimeout(publicClient.getBlockNumber(), RPC_TIMEOUT_MS, "getBlockNumber");
       const fromBlock = latestBlock > LOOKBACK_BLOCKS ? latestBlock - LOOKBACK_BLOCKS : 0n;
 
+      const stakedEvent = stakingAbi.find((item) => "name" in item && item.name === "Staked") as any;
+      const withdrawnEvent = stakingAbi.find((item) => "name" in item && item.name === "Withdrawn") as any;
+      const claimedEvent = stakingAbi.find((item) => "name" in item && item.name === "RewardsClaimed") as any;
+
+      const fetchLogs = async (event: any, type: TxType) => {
+        try {
+          const logs = await withTimeout(
+            publicClient.getLogs({ address: stakingAddress, event, args: { user: address }, fromBlock, toBlock: latestBlock }),
+            RPC_TIMEOUT_MS,
+            `${type} logs`
+          );
+          return logs.map((log) => ({ log, type }));
+        } catch {
+          return [] as { log: any; type: TxType }[];
+        }
+      };
+
       const [stakedLogs, withdrawnLogs, claimedLogs] = await Promise.all([
-        publicClient.getLogs({
-          address: stakingAddress,
-          event: stakingAbi.find((item) => "name" in item && item.name === "Staked") as any,
-          args: { user: address },
-          fromBlock,
-          toBlock: latestBlock,
-        }),
-        publicClient.getLogs({
-          address: stakingAddress,
-          event: stakingAbi.find((item) => "name" in item && item.name === "Withdrawn") as any,
-          args: { user: address },
-          fromBlock,
-          toBlock: latestBlock,
-        }),
-        publicClient.getLogs({
-          address: stakingAddress,
-          event: stakingAbi.find((item) => "name" in item && item.name === "RewardsClaimed") as any,
-          args: { user: address },
-          fromBlock,
-          toBlock: latestBlock,
-        }),
+        fetchLogs(stakedEvent, "Stake"),
+        fetchLogs(withdrawnEvent, "Withdraw"),
+        fetchLogs(claimedEvent, "Claim"),
       ]);
 
-      const allLogs = [
-        ...stakedLogs.map((log) => ({ log, type: "Stake" as TxType })),
-        ...withdrawnLogs.map((log) => ({ log, type: "Withdraw" as TxType })),
-        ...claimedLogs.map((log) => ({ log, type: "Claim" as TxType })),
-      ];
+      const allLogs = [...stakedLogs, ...withdrawnLogs, ...claimedLogs];
+
+      if (allLogs.length === 0) {
+        setTransactions([]);
+        setLoading(false);
+        return;
+      }
 
       const blockNumbers = Array.from(new Set(allLogs.map(({ log }) => log.blockNumber)));
       const blockTimestamps = new Map<bigint, number>();
       await Promise.all(
         blockNumbers.map(async (blockNumber) => {
           if (blockNumber === null) return;
-          const block = await publicClient.getBlock({ blockNumber });
-          blockTimestamps.set(blockNumber, Number(block.timestamp));
+          try {
+            const block = await withTimeout(publicClient.getBlock({ blockNumber }), RPC_TIMEOUT_MS, `block ${blockNumber}`);
+            blockTimestamps.set(blockNumber, Number(block.timestamp));
+          } catch {
+            blockTimestamps.set(blockNumber, 0);
+          }
         })
       );
 

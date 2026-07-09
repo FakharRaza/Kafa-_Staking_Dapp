@@ -317,32 +317,52 @@ export function StakingCard() {
     [claimedRewards, decimals]
   );
 
-  // Reward ticker: animate rewards increasing locally, proportional to this
-  // wallet's share of the pool (matches the on-chain rewardPerToken formula),
-  // so it stops ticking once the wallet's staked balance is zero.
-  const [displayRewards, setDisplayRewards] = useState<number>(() => Number(formattedRewards));
+  // Calculate lifetime total earned = claimed + pending (in wei, then format)
+  const lifetimeEarned = useMemo(() => {
+    const pending = (rewards as bigint | undefined) ?? 0n;
+    const claimed = (claimedRewards as bigint | undefined) ?? 0n;
+    return formatTokenAmount(pending + claimed, decimals, 6);
+  }, [rewards, claimedRewards, decimals]);
+
+  // Reward ticker: use wei-based math for precision, then format for display.
+  // userRateWei = globalRateWei * userStakedWei / totalStakedWei
+  const [displayRewards, setDisplayRewards] = useState<number>(0);
   useEffect(() => {
-    setDisplayRewards(Number(formattedRewards));
-  }, [formattedRewards]);
+    const rewardsWei = (rewards as bigint | undefined) ?? 0n;
+    setDisplayRewards(parseFloat(formatUnits(rewardsWei, decimals)));
+  }, [rewards, decimals]);
+
   useEffect(() => {
     let raf = 0;
     let last = Date.now();
+    const rawStakedWei = (stakedBalance as bigint | undefined) ?? 0n;
+    const rawTotalWei = (totalStaked as bigint | undefined) ?? 0n;
+    const rawRateWei = (rewardRate as bigint | undefined) ?? 0n;
+    const userRateWei = rawTotalWei > 0n && rawStakedWei > 0n ? (rawRateWei * rawStakedWei) / rawTotalWei : 0n;
+    const userRateTokens = parseFloat(formatUnits(userRateWei, decimals));
+
     const tick = () => {
       const now = Date.now();
       const dt = (now - last) / 1000;
       last = now;
-      const globalRate = Number(formattedRewardRate);
-      const userStaked = Number(formattedStaked);
-      const poolStaked = Number(formattedTotalStaked);
-      const userShareRate = poolStaked > 0 && userStaked > 0 ? globalRate * (userStaked / poolStaked) : 0;
-      if (!isNaN(userShareRate) && userShareRate > 0) {
-        setDisplayRewards((v) => v + userShareRate * dt);
+      if (!isNaN(userRateTokens) && userRateTokens > 0) {
+        setDisplayRewards((v) => v + userRateTokens * dt);
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [formattedRewardRate, formattedStaked, formattedTotalStaked]);
+  }, [rewardRate, stakedBalance, totalStaked, decimals]);
+
+  // User's proportional reward rate (formatted with full precision so it never shows 0)
+  const userRewardRate = useMemo(() => {
+    const rawStakedWei = (stakedBalance as bigint | undefined) ?? 0n;
+    const rawTotalWei = (totalStaked as bigint | undefined) ?? 0n;
+    const rawRateWei = (rewardRate as bigint | undefined) ?? 0n;
+    const userRateWei = rawTotalWei > 0n && rawStakedWei > 0n ? (rawRateWei * rawStakedWei) / rawTotalWei : 0n;
+    // Show full 18-decimal precision so tiny rates aren't rounded to 0
+    return formatUnits(userRateWei, decimals);
+  }, [rewardRate, stakedBalance, totalStaked, decimals]);
 
   const handleConnectWallet = () => {
     if (connector) {
@@ -367,7 +387,8 @@ export function StakingCard() {
         stakedBalance={Number(formattedStaked).toFixed(4)}
         pendingRewards={displayRewards.toFixed(4)}
         claimedRewards={Number(formattedClaimedRewards).toFixed(4)}
-        rewardRate={formattedRewardRate}
+        rewardRate={userRewardRate}
+        lifetimeEarned={lifetimeEarned}
       />
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-3">
@@ -418,16 +439,17 @@ export function StakingCard() {
               </div>
              <RewardsCard
   rewards={displayRewards.toFixed(4)}
-  rewardRate={formattedRewardRate}
+  rewardRate={userRewardRate}
   tokenSymbol={tokenLabel}
   claimedRewards={Number(formattedClaimedRewards).toFixed(4)}
+  lifetimeEarned={lifetimeEarned}
   onClaim={handleClaim}
   disabled={!isConnected}
   loading={isConfirming}
 />
               <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-3 sm:p-4 shadow-sm">
                 <p className="text-xs sm:text-sm text-slate-400">Reward rate</p>
-                <p className="mt-2 break-words text-sm font-semibold text-white sm:text-base md:text-lg">{formattedRewardRate} {tokenLabel}/sec</p>
+                <p className="mt-2 break-words text-sm font-semibold text-white sm:text-base md:text-lg">{userRewardRate} {tokenLabel}/sec</p>
               </div>
               <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-3 sm:p-4 shadow-sm">
                 <p className="text-xs sm:text-sm text-slate-400">Total staked</p>
@@ -519,9 +541,10 @@ export function StakingCard() {
 
   <RewardsPanel
     rewards={displayRewards.toFixed(4)}
-    rewardRate={formattedRewardRate}
+    rewardRate={userRewardRate}
     tokenSymbol={tokenLabel}
     claimedRewards={Number(formattedClaimedRewards).toFixed(4)}
+    lifetimeEarned={lifetimeEarned}
     onClaim={handleClaim}
     loading={isConfirming}
   />

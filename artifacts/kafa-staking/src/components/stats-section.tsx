@@ -37,6 +37,7 @@ type StatsSectionProps = {
   pendingRewards?: string;
   claimedRewards?: string;
   rewardRate?: string;
+  lifetimeEarned?: string;
   isConnected?: boolean;
 };
 
@@ -51,6 +52,7 @@ export function StatsSection({
   pendingRewards,
   claimedRewards,
   rewardRate,
+  lifetimeEarned,
   isConnected,
 }: StatsSectionProps) {
   const suffix = tokenSymbol ? ` ${tokenSymbol}` : "";
@@ -73,9 +75,10 @@ export function StatsSection({
         </div>
       ) : null}
 
-      {rewardRate ? (
-        <div className="grid grid-cols-1">
-          <StatCard label="Reward Rate" value={`${rewardRate}${suffix}/sec`} icon="⚡" gradient="from-yellow-400/30 to-amber-400/30" />
+      {isConnected && lifetimeEarned ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <StatCard label="Reward Rate" value={`${rewardRate ?? "0"}${suffix}/sec`} icon="⚡" gradient="from-yellow-400/30 to-amber-400/30" />
+          <StatCard label="Lifetime Earned" value={`${lifetimeEarned}${suffix}`} icon="🏆" gradient="from-amber-400/30 to-orange-400/30" />
         </div>
       ) : null}
     </div>

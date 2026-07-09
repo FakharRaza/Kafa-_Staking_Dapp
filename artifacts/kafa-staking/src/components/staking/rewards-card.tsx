@@ -4,6 +4,7 @@ interface RewardsCardProps {
   rewardRate: string;
   tokenSymbol?: string;
   claimedRewards?: string;
+  lifetimeEarned?: string;
   onClaim?: () => void;
   disabled?: boolean;
   loading?: boolean;
@@ -14,6 +15,7 @@ export function RewardsCard({
   rewardRate,
   tokenSymbol = "",
   claimedRewards,
+  lifetimeEarned,
   onClaim,
   disabled,
   loading,
@@ -49,21 +51,28 @@ export function RewardsCard({
           <p className="text-sm text-slate-400">
             Reward Rate
           </p>
-
           <p className="mt-1 break-words text-sm font-semibold text-emerald-400 sm:text-base">
             {rewardRate}{suffix} / sec
           </p>
         </div>
-
         <div className="rounded-xl bg-slate-800/50 p-4">
           <p className="text-sm text-slate-400">
             Claimed Rewards
           </p>
-
           <p className="mt-1 break-words text-sm font-semibold text-white sm:text-base">
             {claimedRewards ?? "0"}{suffix}
           </p>
         </div>
+        {lifetimeEarned ? (
+          <div className="rounded-xl bg-slate-800/50 p-4">
+            <p className="text-sm text-slate-400">
+              Lifetime Earned
+            </p>
+            <p className="mt-1 break-words text-sm font-semibold text-amber-400 sm:text-base">
+              {lifetimeEarned}{suffix}
+            </p>
+          </div>
+        ) : null}
       </div>
 
 

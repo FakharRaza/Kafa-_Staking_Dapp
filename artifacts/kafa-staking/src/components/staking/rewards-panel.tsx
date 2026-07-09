@@ -4,6 +4,7 @@ type RewardsPanelProps = {
   rewardRate: string;
   tokenSymbol: string;
   claimedRewards?: string;
+  lifetimeEarned?: string;
   onClaim: () => void;
   disabled?: boolean;
   loading?: boolean;
@@ -14,6 +15,7 @@ export default function RewardsPanel({
   rewardRate,
   tokenSymbol,
   claimedRewards,
+  lifetimeEarned,
   onClaim,
   disabled,
   loading,
@@ -41,21 +43,28 @@ export default function RewardsPanel({
           <p className="text-xs text-slate-400">
             Reward Rate
           </p>
-
           <p className="mt-2 break-words text-sm font-semibold text-emerald-400 sm:text-base">
             {rewardRate} {tokenSymbol}/sec
           </p>
         </div>
-
         <div className="rounded-2xl bg-slate-900/70 p-4">
           <p className="text-xs text-slate-400">
             Claimed Rewards
           </p>
-
           <p className="mt-2 break-words text-sm font-semibold text-white sm:text-base">
             {claimedRewards ?? "0"} {tokenSymbol}
           </p>
         </div>
+        {lifetimeEarned ? (
+          <div className="rounded-2xl bg-slate-900/70 p-4">
+            <p className="text-xs text-slate-400">
+              Lifetime Earned
+            </p>
+            <p className="mt-2 break-words text-sm font-semibold text-amber-400 sm:text-base">
+              {lifetimeEarned} {tokenSymbol}
+            </p>
+          </div>
+        ) : null}
       </div>
 
 
