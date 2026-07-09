@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "lJ812QTVSKWu90OSaHTC9"
+uri = "file://kafa-staking-project.tar.gz"
+type = "unspecified"
+title = "Kafa Staking dApp - Full Project Archive"

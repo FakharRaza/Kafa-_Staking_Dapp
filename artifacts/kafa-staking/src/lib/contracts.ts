@@ -1,6 +1,6 @@
 import type { Address } from "viem";
 
-export const stakingAddress = ((import.meta.env.VITE_STAKING_ADDRESS as Address | undefined) || "0xE1Eb54D0ccDbF0ddAA9954F5f09b9068394DfBfE") as Address;
+export const stakingAddress = ((import.meta.env.VITE_STAKING_ADDRESS as Address | undefined) || "0x6D4F2be44b04e516701531E8bDE155BC067EE288") as Address;
 export const stakingTokenAddress = ((import.meta.env.VITE_STAKING_TOKEN_ADDRESS as Address | undefined) || "0xDEaD19098e9D9ca64EF043D0BF3aE0AECa850809") as Address;
 
 export const stakingAbi = [

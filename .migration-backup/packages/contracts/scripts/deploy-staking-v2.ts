@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 const EXISTING_TOKEN_ADDRESS = "0xDEaD19098e9D9ca64EF043D0BF3aE0AECa850809";
-const REWARD_RATE_PER_SECOND = 100;
+const REWARD_RATE_PER_SECOND = ethers.parseUnits("100", 18); // 100 TOKEN per second
 
 async function main() {
   const [deployer] = await ethers.getSigners();

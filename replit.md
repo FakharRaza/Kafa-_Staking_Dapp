@@ -36,11 +36,11 @@ A decentralized staking application where users connect a wallet, stake KAFA (ER
 ## Deployed contracts (Sepolia testnet, chain id 11155111)
 
 - MockERC20 (KAFA test token): `0xDEaD19098e9D9ca64EF043D0BF3aE0AECa850809` (unchanged since first deploy)
-- Staking (v2, current): `0xE1Eb54D0ccDbF0ddAA9954F5f09b9068394DfBfE` — redeployed to add `totalClaimedRewards` mapping + `RewardAdded` event + `addRewards()` function; the original v1 address `0xD484364608b463eDc89a8500e4B1A29DEe5299a6` is abandoned/unused
+- Staking (v3, current): `0x6D4F2be44b04e516701531E8bDE155BC067EE288` — redeployed with corrected `rewardRatePerSecond` (`100 * 10^18` wei = 100 TOKEN/sec) so rewards display meaningfully; previous v2 address `0xE1Eb54D0ccDbF0ddAA9954F5f09b9068394DfBfE` and v1 `0xD484364608b463eDc89a8500e4B1A29DEe5299a6` are abandoned/unused
 - Deployer/reward-pool funder wallet: `0xC04f96C3Bb3853268Eae1A5A0BF4Aa3479B689D4`
-- Reward pool pre-funded with 1,000,000 test tokens minted directly to the v2 Staking contract (v1's reward pool is stranded/unused).
+- Reward pool pre-funded with 1,000,000 test tokens minted directly to the v3 Staking contract.
 - Frontend defaults to these addresses in `src/lib/contracts.ts` (overridable via `VITE_STAKING_ADDRESS` / `VITE_STAKING_TOKEN_ADDRESS`).
-- Deploy script for redeploying Staking against the existing token: `.migration-backup/packages/contracts/scripts/deploy-staking-v2.ts`.
+- Deploy script: `.migration-backup/packages/contracts/scripts/deploy-staking-v2.ts`.
 
 ## User preferences
 
