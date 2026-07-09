@@ -64,7 +64,7 @@ function shortenHash(hash: string): string {
 }
 
 const EXPLORER_TX_BASE = "https://sepolia.etherscan.io/tx/";
-const LOOKBACK_BLOCKS = 200_000n;
+const LOOKBACK_BLOCKS = 10_000n;
 
 export function RecentTransactions({
   address,
@@ -178,7 +178,7 @@ export function RecentTransactions({
         </div>
       </div>
 
-      <div className="mt-5 overflow-x-auto">
+      <div className="mt-5 -mx-2 overflow-x-auto px-2">
         {!address ? (
           <p className="py-8 text-center text-sm text-slate-400">Connect your wallet to see your transaction history.</p>
         ) : loading ? (
@@ -188,41 +188,28 @@ export function RecentTransactions({
         ) : transactions.length === 0 ? (
           <p className="py-8 text-center text-sm text-slate-400">No transactions found yet.</p>
         ) : (
-          <table className="w-full min-w-[640px] border-separate border-spacing-y-2 text-left">
-            <thead>
-              <tr className="text-xs uppercase tracking-wider text-slate-400">
-                <th className="px-4 py-2 font-medium">Type</th>
-                <th className="px-4 py-2 font-medium">Amount</th>
-                <th className="px-4 py-2 font-medium">Time</th>
-                <th className="px-4 py-2 font-medium">Tx Hash</th>
-                <th className="px-4 py-2 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((tx) => (
-                <tr key={tx.id} className="group rounded-xl bg-white/5 transition-colors duration-200 hover:bg-white/10">
-                  <td className="rounded-l-xl px-4 py-3">
-                    <TypeBadge type={tx.type} />
-                  </td>
-                  <td className="px-4 py-3 font-medium text-white">{tx.amount}</td>
-                  <td className="px-4 py-3 text-sm text-slate-400">{formatRelativeTime(tx.timestamp)}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <a
-                      href={`${EXPLORER_TX_BASE}${tx.hash}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-mono text-cyan-400 hover:text-cyan-300 hover:underline"
-                    >
-                      {shortenHash(tx.hash)}
-                    </a>
-                  </td>
-                  <td className="rounded-r-xl px-4 py-3">
-                    <StatusBadge status={tx.status} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="divide-y divide-white/5">
+            {transactions.map((tx) => (
+              <div key={tx.id} className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <TypeBadge type={tx.type} />
+                  <span className="font-medium text-white">{tx.amount}</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-slate-400">
+                  <span>{formatRelativeTime(tx.timestamp)}</span>
+                  <a
+                    href={`${EXPLORER_TX_BASE}${tx.hash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-cyan-400 hover:text-cyan-300 hover:underline"
+                  >
+                    {shortenHash(tx.hash)}
+                  </a>
+                  <StatusBadge status={tx.status} />
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -8,6 +8,7 @@ import { useAccount, useBalance, useConnect, useDisconnect, useReadContract, use
 import { injected } from "wagmi/connectors";
 import { formatUnits, parseUnits } from "viem";
 import { erc20Abi, stakingAbi, stakingAddress, stakingTokenAddress } from "@/lib/contracts";
+import { formatTokenAmount } from "@/lib/format";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatsSection } from "@/components/stats-section";
 import { RecentTransactions } from "@/components/recent-transactions";
@@ -155,19 +156,12 @@ export function StakingCard() {
   const connector = useMemo(() => connectors.find((item) => item.id === "injected") ?? connectors[0], [connectors]);
 
   const decimals = Number(tokenDecimals ?? 18);
-  const formattedAllowance = useMemo(() => (allowance ? formatUnits(allowance as bigint, decimals) : "0"), [allowance, decimals]);
-  const formattedStaked = useMemo(() => (stakedBalance ? formatUnits(stakedBalance as bigint, 18) : "0"), [stakedBalance]);
-  const formattedRewards = useMemo(() => (rewards ? formatUnits(rewards as bigint, 18) : "0"), [rewards]);
-  const formattedRewardRate = useMemo(() => (rewardRate ? formatUnits(rewardRate as bigint, 18) : "0"), [rewardRate]);
-  const formattedTotalStaked = useMemo(() => (totalStaked ? formatUnits(totalStaked as bigint, 18) : "0"), [totalStaked]);
-  const formattedTokenBalance = useMemo(() => {
-    if (!tokenBalance) return "0";
-    try {
-      return formatUnits(tokenBalance as bigint, decimals);
-    } catch {
-      return "0";
-    }
-  }, [tokenBalance, decimals]);
+  const formattedAllowance = useMemo(() => formatTokenAmount(allowance as bigint | undefined, decimals, 6), [allowance, decimals]);
+  const formattedStaked = useMemo(() => formatTokenAmount(stakedBalance as bigint | undefined, decimals, 6), [stakedBalance, decimals]);
+  const formattedRewards = useMemo(() => formatTokenAmount(rewards as bigint | undefined, decimals, 6), [rewards, decimals]);
+  const formattedRewardRate = useMemo(() => formatTokenAmount(rewardRate as bigint | undefined, decimals, 6), [rewardRate, decimals]);
+  const formattedTotalStaked = useMemo(() => formatTokenAmount(totalStaked as bigint | undefined, decimals, 6), [totalStaked, decimals]);
+  const formattedTokenBalance = useMemo(() => formatTokenAmount(tokenBalance as bigint | undefined, decimals, 6), [tokenBalance, decimals]);
   const parsedStakeAmount = Number(stakeAmount || "0");
   const nativeBalance = balance ? Number(balance.formatted) : 0;
   const tokenBalanceValue = Number(formattedTokenBalance || "0");
@@ -319,8 +313,8 @@ export function StakingCard() {
   ]);
 
   const formattedClaimedRewards = useMemo(
-    () => (claimedRewards ? formatUnits(claimedRewards as bigint, 18) : "0"),
-    [claimedRewards]
+    () => formatTokenAmount(claimedRewards as bigint | undefined, decimals, 6),
+    [claimedRewards, decimals]
   );
 
   // Reward ticker: animate rewards increasing locally, proportional to this
@@ -418,9 +412,9 @@ export function StakingCard() {
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-4 shadow-sm">
-                <p className="text-sm text-slate-400">Staked balance</p>
-                <p className="mt-2 text-2xl font-semibold text-white">{formattedStaked}</p>
+              <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-3 sm:p-4 shadow-sm">
+                <p className="text-xs sm:text-sm text-slate-400">Staked balance</p>
+                <p className="mt-2 break-words text-sm font-semibold text-white sm:text-base md:text-lg">{formattedStaked} {tokenLabel}</p>
               </div>
              <RewardsCard
   rewards={displayRewards.toFixed(4)}
@@ -431,13 +425,13 @@ export function StakingCard() {
   disabled={!isConnected}
   loading={isConfirming}
 />
-              <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-4 shadow-sm">
-                <p className="text-sm text-slate-400">Reward rate</p>
-                <p className="mt-2 text-2xl font-semibold text-white">{formattedRewardRate}/sec</p>
+              <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-3 sm:p-4 shadow-sm">
+                <p className="text-xs sm:text-sm text-slate-400">Reward rate</p>
+                <p className="mt-2 break-words text-sm font-semibold text-white sm:text-base md:text-lg">{formattedRewardRate} {tokenLabel}/sec</p>
               </div>
-              <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-4 shadow-sm">
-                <p className="text-sm text-slate-400">Total staked</p>
-                <p className="mt-2 text-2xl font-semibold text-white">{formattedTotalStaked}</p>
+              <div className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-800/50 p-3 sm:p-4 shadow-sm">
+                <p className="text-xs sm:text-sm text-slate-400">Total staked</p>
+                <p className="mt-2 break-words text-sm font-semibold text-white sm:text-base md:text-lg">{formattedTotalStaked} {tokenLabel}</p>
               </div>
             </div>
 

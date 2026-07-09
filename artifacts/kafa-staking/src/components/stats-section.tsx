@@ -21,7 +21,7 @@ function StatCard({ label, value, icon, gradient }: StatCardProps) {
           {icon}
         </span>
       </div>
-      <p className="relative mt-4 truncate text-xl font-bold text-white sm:text-2xl">{value}</p>
+      <p className="relative mt-4 break-words text-lg font-bold text-white sm:text-xl lg:text-2xl">{value}</p>
     </div>
   );
 }

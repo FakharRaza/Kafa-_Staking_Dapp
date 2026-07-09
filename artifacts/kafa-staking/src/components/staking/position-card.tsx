@@ -20,7 +20,7 @@ export default function PositionCard({
           Your Position
         </p>
 
-        <h2 className="mt-2 text-3xl font-bold text-white">
+        <h2 className="mt-2 break-words text-base font-bold text-white sm:text-lg md:text-xl lg:text-2xl">
           {staked} {tokenSymbol}
         </h2>
 
@@ -30,14 +30,14 @@ export default function PositionCard({
       </div>
 
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
 
         <div className="rounded-2xl bg-slate-900/70 p-4">
           <p className="text-xs text-slate-400">
             Wallet Balance
           </p>
 
-          <p className="mt-2 text-xl font-semibold text-white">
+          <p className="mt-2 break-words text-sm font-semibold text-white sm:text-base">
             {tokenBalance} {tokenSymbol}
           </p>
         </div>
@@ -48,7 +48,7 @@ export default function PositionCard({
             Total Pool Staked
           </p>
 
-          <p className="mt-2 text-xl font-semibold text-white">
+          <p className="mt-2 break-words text-sm font-semibold text-white sm:text-base">
             {totalStaked} {tokenSymbol}
           </p>
         </div>

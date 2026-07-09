@@ -26,7 +26,7 @@ export default function RewardsPanel({
           Rewards
         </p>
 
-        <h2 className="mt-2 break-all text-2xl font-bold text-white sm:text-3xl">
+        <h2 className="mt-2 break-words text-base font-bold text-white sm:text-lg md:text-xl">
           {rewards} {tokenSymbol}
         </h2>
 
@@ -36,13 +36,13 @@ export default function RewardsPanel({
       </div>
 
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3">
         <div className="rounded-2xl bg-slate-900/70 p-4">
           <p className="text-xs text-slate-400">
             Reward Rate
           </p>
 
-          <p className="mt-2 text-xl font-semibold text-emerald-400">
+          <p className="mt-2 break-words text-sm font-semibold text-emerald-400 sm:text-base">
             {rewardRate} {tokenSymbol}/sec
           </p>
         </div>
@@ -52,7 +52,7 @@ export default function RewardsPanel({
             Claimed Rewards
           </p>
 
-          <p className="mt-2 text-xl font-semibold text-white">
+          <p className="mt-2 break-words text-sm font-semibold text-white sm:text-base">
             {claimedRewards ?? "0"} {tokenSymbol}
           </p>
         </div>

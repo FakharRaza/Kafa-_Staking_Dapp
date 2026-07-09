@@ -1,9 +1,8 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { useState } from "react";
-import { http, createConfig } from "wagmi";
+import { http, fallback, createConfig } from "wagmi";
 import { mainnet, sepolia, localhost } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 import { Toaster } from "sonner";
@@ -16,8 +15,12 @@ const config = createConfig({
   chains: [mainnet, sepolia, localhost],
   connectors: [injected()],
   transports: {
-    [mainnet.id]: http(mainnetRpcUrl),
-    [sepolia.id]: http(sepoliaRpcUrl),
+    [mainnet.id]: fallback([http(mainnetRpcUrl), http("https://rpc.ankr.com/eth")]),
+    [sepolia.id]: fallback([
+      http(sepoliaRpcUrl),
+      http("https://rpc.sepolia.org"),
+      http("https://rpc2.sepolia.org"),
+    ]),
     [localhost.id]: http(localhostRpcUrl),
   },
 });

@@ -38,19 +38,19 @@ export function RewardsCard({
           Pending Rewards
         </p>
 
-        <p className="mt-2 break-all text-3xl font-bold text-white sm:text-4xl">
+        <p className="mt-2 break-words text-base font-bold text-white sm:text-lg md:text-xl lg:text-2xl">
           {rewards}{suffix}
         </p>
       </div>
 
 
-      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-3">
         <div className="rounded-xl bg-slate-800/50 p-4">
           <p className="text-sm text-slate-400">
             Reward Rate
           </p>
 
-          <p className="mt-1 text-xl font-semibold text-emerald-400">
+          <p className="mt-1 break-words text-sm font-semibold text-emerald-400 sm:text-base">
             {rewardRate}{suffix} / sec
           </p>
         </div>
@@ -60,7 +60,7 @@ export function RewardsCard({
             Claimed Rewards
           </p>
 
-          <p className="mt-1 text-xl font-semibold text-white">
+          <p className="mt-1 break-words text-sm font-semibold text-white sm:text-base">
             {claimedRewards ?? "0"}{suffix}
           </p>
         </div>

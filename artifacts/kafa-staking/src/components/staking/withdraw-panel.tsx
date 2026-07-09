@@ -28,7 +28,7 @@ export default function WithdrawPanel({
           Withdraw
         </p>
 
-        <h2 className="mt-2 text-2xl font-bold text-white">
+        <h2 className="mt-2 break-words text-xl font-bold text-white sm:text-2xl">
           Withdraw {tokenSymbol}
         </h2>
       </div>
